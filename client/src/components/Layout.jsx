@@ -43,6 +43,7 @@ export default function Layout({ children }) {
           </svg>
         </button>
         <Logo size={22} />
+        <span className="tier-badge">Standard</span>
       </header>
       <div
         className={'mobile-backdrop' + (drawerOpen ? ' open' : '')}
@@ -50,7 +51,8 @@ export default function Layout({ children }) {
       />
       <aside className={'sidebar' + (drawerOpen ? ' open' : '')}>
         <div className="brand">
-          <Logo size={26} />
+          <Logo size={30} />
+          <span className="tier-badge">Standard</span>
         </div>
         <nav>
           <NavLink to="/" end>{t('nav.dashboard')}</NavLink>
@@ -75,7 +77,7 @@ export default function Layout({ children }) {
           <button className="link" onClick={logout}>
             {t('nav.logout')}
           </button>
-          <div className="brand-credit">Logic Loving Mind · v0.1</div>
+          <div className="brand-credit">Logic Loving Mind · Standard · v0.1</div>
         </div>
       </aside>
       <main className="main">{children}</main>

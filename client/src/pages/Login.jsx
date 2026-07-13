@@ -32,6 +32,7 @@ export default function Login({ onLogin }) {
       <div className="login-brand">
         <Logo size={44} />
         <Wordmark width={276} style={{ marginTop: 16 }} />
+        <div className="login-tier">Standard Edition</div>
       </div>
       <form className="card login-box" onSubmit={submit}>
         <h1>{t('login.title')}</h1>
