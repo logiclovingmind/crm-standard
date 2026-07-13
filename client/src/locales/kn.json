@@ -1,0 +1,119 @@
+{
+  "app": { "title": "CRM", "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ…", "noResults": "ಫಲಿತಾಂಶಗಳಿಲ್ಲ", "error": "ಏನೋ ತಪ್ಪಾಗಿದೆ" },
+  "nav": {
+    "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    "leads": "ಲೀಡ್‌ಗಳು",
+    "inventory": "ದಾಸ್ತಾನು",
+    "visits": "ಸೈಟ್ ಭೇಟಿಗಳು",
+    "users": "ಬಳಕೆದಾರರು",
+    "logout": "ಲಾಗ್ ಔಟ್"
+  },
+  "login": { "title": "ಸೈನ್ ಇನ್", "submit": "ಸೈನ್ ಇನ್", "failed": "ತಪ್ಪಾದ ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್" },
+  "common": {
+    "name": "ಹೆಸರು",
+    "phone": "ಫೋನ್",
+    "email": "ಇಮೇಲ್",
+    "password": "ಪಾಸ್‌ವರ್ಡ್",
+    "role": "ಪಾತ್ರ",
+    "status": "ಸ್ಥಿತಿ",
+    "source": "ಮೂಲ",
+    "actions": "ಕ್ರಿಯೆಗಳು",
+    "save": "ಉಳಿಸಿ",
+    "cancel": "ರದ್ದುಮಾಡಿ",
+    "add": "ಸೇರಿಸಿ",
+    "search": "ಹುಡುಕಿ",
+    "all": "ಎಲ್ಲಾ",
+    "created": "ರಚಿಸಲಾಗಿದೆ",
+    "assignedTo": "ನಿಯೋಜಿತ",
+    "unassigned": "ನಿಯೋಜಿಸಿಲ್ಲ",
+    "dateTime": "ದಿನಾಂಕ ಮತ್ತು ಸಮಯ"
+  },
+  "status": {
+    "New": "ಹೊಸದು",
+    "Contacted": "ಸಂಪರ್ಕಿಸಲಾಗಿದೆ",
+    "Site Visit": "ಸೈಟ್ ಭೇಟಿ",
+    "Negotiation": "ಮಾತುಕತೆ",
+    "Closed": "ಮುಕ್ತಾಯ",
+    "Lost": "ಕಳೆದುಹೋಗಿದೆ"
+  },
+  "source": {
+    "whatsapp": "ವಾಟ್ಸಾಪ್",
+    "walk-in": "ವಾಕ್-ಇನ್",
+    "99acres": "99acres",
+    "magicbricks": "Magicbricks",
+    "referral": "ಶಿಫಾರಸು",
+    "other": "ಇತರೆ"
+  },
+  "role": { "owner": "ಮಾಲೀಕ", "manager": "ಮ್ಯಾನೇಜರ್", "agent": "ಏಜೆಂಟ್" },
+  "dashboard": {
+    "title": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    "leadsThisMonth": "ಈ ತಿಂಗಳ ಲೀಡ್‌ಗಳು",
+    "lastMonth": "ಕಳೆದ ತಿಂಗಳು: {{count}}",
+    "sourceBreakdown": "ಮೂಲಗಳ ವಿಂಗಡಣೆ",
+    "funnel": "ಮಾರಾಟ ಫನಲ್",
+    "staleLeads": "3 ದಿನಗಳಿಂದ ಸಂಪರ್ಕವಿಲ್ಲ",
+    "staleCount": "ಹಳೆಯ ಲೀಡ್‌ಗಳು",
+    "lastActivity": "ಕೊನೆಯ ಚಟುವಟಿಕೆ",
+    "backupWarning": "ಬ್ಯಾಕಪ್ ಎಚ್ಚರಿಕೆ: {{message}}"
+  },
+  "leads": {
+    "title": "ಲೀಡ್‌ಗಳು",
+    "newLead": "ಹೊಸ ಲೀಡ್",
+    "requirement": "ಅವಶ್ಯಕತೆ",
+    "exportExcel": "ಎಕ್ಸೆಲ್‌ಗೆ ರಫ್ತು ಮಾಡಿ",
+    "filters": "ಫಿಲ್ಟರ್‌ಗಳು"
+  },
+  "leadDetail": {
+    "notes": "ಟಿಪ್ಪಣಿಗಳು",
+    "addNote": "ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ",
+    "notePlaceholder": "ಟಿಪ್ಪಣಿ ಬರೆಯಿರಿ…",
+    "activity": "ಚಟುವಟಿಕೆ",
+    "unitsOfInterest": "ಆಸಕ್ತಿಯ ಯುನಿಟ್‌ಗಳು",
+    "linkUnit": "ಯುನಿಟ್ ಲಿಂಕ್ ಮಾಡಿ",
+    "remove": "ತೆಗೆದುಹಾಕಿ",
+    "scheduleVisit": "ಸೈಟ್ ಭೇಟಿ ನಿಗದಿಪಡಿಸಿ",
+    "assign": "ನಿಯೋಜಿಸಿ",
+    "conversationSummary": "ಸಂಭಾಷಣೆಯ ಸಾರಾಂಶ",
+    "visits": "ಸೈಟ್ ಭೇಟಿಗಳು"
+  },
+  "visits": {
+    "title": "ಸೈಟ್ ಭೇಟಿಗಳು",
+    "agent": "ಏಜೆಂಟ್",
+    "lead": "ಲೀಡ್",
+    "project": "ಪ್ರಾಜೆಕ್ಟ್",
+    "unit": "ಯುನಿಟ್",
+    "scheduledAt": "ನಿಗದಿತ ಸಮಯ"
+  },
+  "visitStatus": {
+    "scheduled": "ನಿಗದಿಯಾಗಿದೆ",
+    "completed": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "no-show": "ಬರಲಿಲ್ಲ",
+    "cancelled": "ರದ್ದಾಗಿದೆ"
+  },
+  "inventory": {
+    "title": "ದಾಸ್ತಾನು",
+    "projects": "ಪ್ರಾಜೆಕ್ಟ್‌ಗಳು",
+    "units": "ಯುನಿಟ್‌ಗಳು",
+    "newProject": "ಹೊಸ ಪ್ರಾಜೆಕ್ಟ್",
+    "newUnit": "ಹೊಸ ಯುನಿಟ್",
+    "location": "ಸ್ಥಳ",
+    "description": "ವಿವರಣೆ",
+    "identifier": "ಗುರುತು",
+    "type": "ಪ್ರಕಾರ",
+    "areaSqft": "ವಿಸ್ತೀರ್ಣ (ಚ.ಅ.)",
+    "price": "ಬೆಲೆ",
+    "availableCount": "{{total}} ರಲ್ಲಿ {{available}} ಲಭ್ಯವಿದೆ"
+  },
+  "unitType": { "1BHK": "1 BHK", "2BHK": "2 BHK", "3BHK": "3 BHK", "plot": "ಪ್ಲಾಟ್", "villa": "ವಿಲ್ಲಾ" },
+  "unitStatus": { "available": "ಲಭ್ಯವಿದೆ", "blocked": "ತಡೆಹಿಡಿಯಲಾಗಿದೆ", "sold": "ಮಾರಾಟವಾಗಿದೆ" },
+  "users": {
+    "title": "ಬಳಕೆದಾರರು",
+    "addUser": "ಬಳಕೆದಾರರನ್ನು ಸೇರಿಸಿ",
+    "active": "ಸಕ್ರಿಯ",
+    "inactive": "ನಿಷ್ಕ್ರಿಯ",
+    "deactivate": "ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ",
+    "activate": "ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    "resetPassword": "ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ",
+    "newPasswordPrompt": "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ (ಕನಿಷ್ಠ 10 ಅಕ್ಷರಗಳು):"
+  }
+}

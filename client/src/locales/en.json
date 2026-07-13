@@ -1,0 +1,119 @@
+{
+  "app": { "title": "CRM", "loading": "Loading…", "noResults": "No results", "error": "Something went wrong" },
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "inventory": "Inventory",
+    "visits": "Site Visits",
+    "users": "Users",
+    "logout": "Log out"
+  },
+  "login": { "title": "Sign in", "submit": "Sign in", "failed": "Invalid email or password" },
+  "common": {
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "status": "Status",
+    "source": "Source",
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel",
+    "add": "Add",
+    "search": "Search",
+    "all": "All",
+    "created": "Created",
+    "assignedTo": "Assigned to",
+    "unassigned": "Unassigned",
+    "dateTime": "Date & time"
+  },
+  "status": {
+    "New": "New",
+    "Contacted": "Contacted",
+    "Site Visit": "Site Visit",
+    "Negotiation": "Negotiation",
+    "Closed": "Closed",
+    "Lost": "Lost"
+  },
+  "source": {
+    "whatsapp": "WhatsApp",
+    "walk-in": "Walk-in",
+    "99acres": "99acres",
+    "magicbricks": "Magicbricks",
+    "referral": "Referral",
+    "other": "Other"
+  },
+  "role": { "owner": "Owner", "manager": "Manager", "agent": "Agent" },
+  "dashboard": {
+    "title": "Dashboard",
+    "leadsThisMonth": "Leads this month",
+    "lastMonth": "Last month: {{count}}",
+    "sourceBreakdown": "Source breakdown",
+    "funnel": "Pipeline funnel",
+    "staleLeads": "No contact in 3 days",
+    "staleCount": "Stale leads",
+    "lastActivity": "Last activity",
+    "backupWarning": "Backup warning: {{message}}"
+  },
+  "leads": {
+    "title": "Leads",
+    "newLead": "New lead",
+    "requirement": "Requirement",
+    "exportExcel": "Export to Excel",
+    "filters": "Filters"
+  },
+  "leadDetail": {
+    "notes": "Notes",
+    "addNote": "Add note",
+    "notePlaceholder": "Write a note…",
+    "activity": "Activity",
+    "unitsOfInterest": "Units of interest",
+    "linkUnit": "Link unit",
+    "remove": "Remove",
+    "scheduleVisit": "Schedule site visit",
+    "assign": "Assign",
+    "conversationSummary": "Conversation summary",
+    "visits": "Site visits"
+  },
+  "visits": {
+    "title": "Site Visits",
+    "agent": "Agent",
+    "lead": "Lead",
+    "project": "Project",
+    "unit": "Unit",
+    "scheduledAt": "Scheduled at"
+  },
+  "visitStatus": {
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "no-show": "No-show",
+    "cancelled": "Cancelled"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "projects": "Projects",
+    "units": "Units",
+    "newProject": "New project",
+    "newUnit": "New unit",
+    "location": "Location",
+    "description": "Description",
+    "identifier": "Identifier",
+    "type": "Type",
+    "areaSqft": "Area (sqft)",
+    "price": "Price",
+    "availableCount": "{{available}} of {{total}} available"
+  },
+  "unitType": { "1BHK": "1 BHK", "2BHK": "2 BHK", "3BHK": "3 BHK", "plot": "Plot", "villa": "Villa" },
+  "unitStatus": { "available": "Available", "blocked": "Blocked", "sold": "Sold" },
+  "users": {
+    "title": "Users",
+    "addUser": "Add user",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "resetPassword": "Reset password",
+    "newPasswordPrompt": "New password (min 10 characters):"
+  }
+}

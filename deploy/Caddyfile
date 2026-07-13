@@ -1,0 +1,31 @@
+# /etc/caddy/Caddyfile — set your domain via /etc/caddy/crm.env (CRM_DOMAIN=crm.example.com)
+# Caddy handles HTTPS + HTTP→HTTPS redirect automatically.
+{$CRM_DOMAIN} {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	handle {
+		root * /opt/crm/client/dist
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	# JSON access log — fail2ban watches this for repeated login failures
+	log {
+		output file /var/log/caddy/crm-access.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+		format json
+	}
+}

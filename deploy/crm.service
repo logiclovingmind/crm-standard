@@ -1,0 +1,23 @@
+[Unit]
+Description=CRM (Standard tier)
+After=network.target
+
+[Service]
+Type=simple
+User=crm
+Group=crm
+WorkingDirectory=/opt/crm
+EnvironmentFile=/etc/crm/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=3
+
+# Keep the 1GB droplet safe
+MemoryMax=512M
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/opt/crm/data
+
+[Install]
+WantedBy=multi-user.target
