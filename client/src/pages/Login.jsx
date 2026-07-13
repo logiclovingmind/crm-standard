@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, setCsrf } from '../api';
+import { Logo, Wordmark } from '../components/Brand';
 
 export default function Login({ onLogin }) {
   const { t } = useTranslation();
@@ -18,7 +19,9 @@ export default function Login({ onLogin }) {
       setCsrf(data.csrfToken);
       onLogin(data.user);
     } catch (err) {
-      setError(err.status === 401 ? t('login.failed') : err.message);
+      if (err.status === 429) setError(t('login.rateLimited'));
+      else if (err.status === 401) setError(t('login.failed'));
+      else setError(err.message);
     } finally {
       setBusy(false);
     }
@@ -26,6 +29,10 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="login-page">
+      <div className="login-brand">
+        <Logo size={44} />
+        <Wordmark width={276} style={{ marginTop: 16 }} />
+      </div>
       <form className="card login-box" onSubmit={submit}>
         <h1>{t('login.title')}</h1>
         <input

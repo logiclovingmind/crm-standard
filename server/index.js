@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const SqliteStore = require('better-sqlite3-session-store')(session);
@@ -44,6 +45,15 @@ function createApp() {
   app.use('/api/settings', requireAuth, requireRole('owner'), require('./routes/settings'));
 
   app.use('/api', (req, res) => res.status(404).json({ error: 'not found' }));
+
+  // On the droplet Caddy serves the client; SERVE_CLIENT=1 is for standalone
+  // hosting (e.g. LAN self-host) where Express serves the built SPA itself.
+  if (process.env.SERVE_CLIENT === '1') {
+    const dist = path.join(__dirname, '..', 'client', 'dist');
+    app.use(express.static(dist));
+    app.get('*', (req, res) => res.sendFile(path.join(dist, 'index.html')));
+  }
+
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     console.error(err);
@@ -55,8 +65,9 @@ function createApp() {
 
 if (require.main === module) {
   const port = Number(process.env.PORT) || 3000;
-  createApp().listen(port, '127.0.0.1', () => {
-    console.log(`CRM API listening on 127.0.0.1:${port}`);
+  const host = process.env.HOST || '127.0.0.1';
+  createApp().listen(port, host, () => {
+    console.log(`CRM API listening on ${host}:${port}`);
   });
 }
 
