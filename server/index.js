@@ -2,13 +2,33 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
+const bcrypt = require('bcrypt');
 const SqliteStore = require('better-sqlite3-session-store')(session);
 const { getDb } = require('./db');
+const { nowIST } = require('./lib/time');
 const { csrfProtect } = require('./middleware/csrf');
 const { requireAuth, requireRole } = require('./middleware/auth');
 
+// Render's free tier wipes SQLite on every redeploy, so we re-seed a demo
+// owner from env vars on startup. No-op if SEED_EMAIL/SEED_PASSWORD unset,
+// or if a user with that email already exists.
+function seedDemoUser(db) {
+  const email = (process.env.SEED_EMAIL || '').trim().toLowerCase();
+  const password = process.env.SEED_PASSWORD || '';
+  const name = (process.env.SEED_NAME || '').trim() || 'Demo';
+  if (!email || !password) return;
+  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+  if (existing) return;
+  const now = nowIST();
+  db.prepare(
+    "INSERT INTO users (name, email, password_hash, role, created_at, updated_at) VALUES (?, ?, ?, 'owner', ?, ?)"
+  ).run(name, email, bcrypt.hashSync(password, 12), now, now);
+  console.log(`seeded demo user: ${email}`);
+}
+
 function createApp() {
   const db = getDb();
+  seedDemoUser(db);
   const app = express();
   const isProd = process.env.NODE_ENV === 'production';
 

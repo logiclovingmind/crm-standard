@@ -37,7 +37,7 @@ export default function Login({ onLogin }) {
       <form className="card login-box" onSubmit={submit}>
         <h1>{t('login.title')}</h1>
         <input
-          type="email"
+          type="text"
           placeholder={t('common.email')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
