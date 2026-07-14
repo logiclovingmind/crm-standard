@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { useAuth } from '../App';
 import { Logo } from './Brand';
+import KeepAwake from './KeepAwake';
 
 export default function Layout({ children }) {
   const { t, i18n } = useTranslation();
@@ -66,6 +67,7 @@ export default function Layout({ children }) {
           <div className="who">
             {me.name} · {t(`role.${me.role}`)}
           </div>
+          <KeepAwake />
           <div className="lang-toggle" style={{ marginBottom: 8 }}>
             <button className={i18n.language === 'en' ? 'active' : ''} onClick={() => switchLanguage('en')}>
               EN

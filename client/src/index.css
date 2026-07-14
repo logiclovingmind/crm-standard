@@ -108,6 +108,20 @@ a:hover { text-decoration: underline; }
 }
 .lang-toggle button.active { background: var(--text); border-color: var(--text); color: var(--bg); }
 
+.keep-awake {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;
+}
+.keep-awake label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.keep-awake input[type="checkbox"] { width: 12px; height: 12px; margin: 0; accent-color: var(--text); }
+.ka-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.ka-dot.off     { background: var(--border); }
+.ka-dot.pending { background: #d4a017; }
+.ka-dot.live    { background: #2ea043; box-shadow: 0 0 6px rgba(46,160,67,0.6); }
+.ka-dot.down    { background: #cf222e; }
+
 .main { flex: 1; padding: 28px 32px; max-width: 1200px; }
 
 /* Panels & cards */
