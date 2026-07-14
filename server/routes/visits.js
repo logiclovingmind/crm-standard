@@ -10,18 +10,31 @@ const router = express.Router();
 router.use(scopeLeadsToUser);
 
 router.get('/', (req, res) => {
-  let sql = `SELECT v.*, l.name AS lead_name, l.phone AS lead_phone, u.name AS agent_name,
-                    p.name AS project_name, un.identifier AS unit_identifier
+  // Bot-created visits only carry lead_id at intake — agent/unit/project are
+  // filled in later on the lead itself. Fall back to the lead's current
+  // assignment and most-recently-linked unit so the panel reflects those edits
+  // without a background sync job. COALESCE means an explicit visit-level
+  // override (from POST /visits) still wins.
+  let sql = `SELECT v.*, l.name AS lead_name, l.phone AS lead_phone,
+                    COALESCE(u.name, u2.name) AS agent_name,
+                    COALESCE(p.name, p2.name) AS project_name,
+                    COALESCE(un.identifier, un2.identifier) AS unit_identifier
              FROM site_visits v
              JOIN leads l ON l.id = v.lead_id
              LEFT JOIN users u ON u.id = v.agent_id
+             LEFT JOIN users u2 ON u2.id = l.assigned_to
              LEFT JOIN projects p ON p.id = v.project_id
              LEFT JOIN units un ON un.id = v.unit_id
+             LEFT JOIN units un2 ON un2.id = (
+               SELECT unit_id FROM lead_units WHERE lead_id = l.id
+               ORDER BY created_at DESC LIMIT 1
+             )
+             LEFT JOIN projects p2 ON p2.id = un2.project_id
              WHERE 1=1`;
   const params = [];
   if (req.leadScope) {
-    sql += ' AND v.agent_id = ?';
-    params.push(req.leadScope);
+    sql += ' AND (v.agent_id = ? OR (v.agent_id IS NULL AND l.assigned_to = ?))';
+    params.push(req.leadScope, req.leadScope);
   }
   if (req.query.status && VISIT_STATUSES.includes(req.query.status)) {
     sql += ' AND v.status = ?';
