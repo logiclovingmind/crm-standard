@@ -7,10 +7,23 @@ import { api } from '../api';
 // the extracted lead state so you can see fields land as the conversation
 // progresses. Reset button wipes the phone's conversation state on the agent.
 
+// The CRM's intake normalizes to +91XXXXXXXXXX and rejects anything that isn't
+// 10 digits, so training phones must look like a real Indian mobile. `9999`
+// prefix keeps them obviously synthetic so nobody confuses a demo lead with a
+// real one.
+function randomSimPhone() {
+  const suffix = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
+  return '9999' + suffix;
+}
+
+function isValid10Digit(p) {
+  return /^\d{10}$/.test(String(p || '').replace(/\D/g, ''));
+}
+
 function defaultPhone() {
   const saved = localStorage.getItem('crm.train.phone');
-  if (saved) return saved;
-  const p = 'sim-' + Math.random().toString(36).slice(2, 8);
+  if (saved && isValid10Digit(saved)) return saved;
+  const p = randomSimPhone();
   localStorage.setItem('crm.train.phone', p);
   return p;
 }
@@ -87,8 +100,7 @@ export default function Train() {
   }
 
   function newSession() {
-    const p = 'sim-' + Math.random().toString(36).slice(2, 8);
-    setPhone(p);
+    setPhone(randomSimPhone());
   }
 
   return (
