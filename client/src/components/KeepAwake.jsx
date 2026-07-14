@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { api } from '../api';
 
-// Demo-only keep-awake: when the toggle is on, the browser tab pings
-// /api/health every 5 min so Render's free tier doesn't spin the CRM down
-// mid-presentation. Purely client-side (localStorage), default off.
+// Demo-only keep-awake for the whole system (CRM + WhatsApp agent). When on,
+// the browser polls /api/status/system every 5 min: that request keeps the
+// CRM warm and its server-side ping keeps the agent warm too. Off by default.
 const STORAGE_KEY = 'crm.keepAwake';
 const INTERVAL_MS = 5 * 60 * 1000;
 
 export default function KeepAwake() {
   const [enabled, setEnabled] = useState(() => localStorage.getItem(STORAGE_KEY) === '1');
-  const [live, setLive] = useState(null);
+  const [status, setStatus] = useState(null); // { crm, agent } | null
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -16,15 +17,15 @@ export default function KeepAwake() {
     if (!enabled) {
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
-      setLive(null);
+      setStatus(null);
       return;
     }
     const ping = async () => {
       try {
-        const res = await fetch('/api/health', { cache: 'no-store' });
-        setLive(res.ok);
+        const data = await api('/status/system');
+        setStatus({ crm: data.crm, agent: data.agent });
       } catch {
-        setLive(false);
+        setStatus({ crm: 'down', agent: 'unknown' });
       }
     };
     ping();
@@ -34,14 +35,23 @@ export default function KeepAwake() {
     };
   }, [enabled]);
 
-  const dotClass = !enabled ? 'off' : live === true ? 'live' : live === false ? 'down' : 'pending';
-  const dotTitle = !enabled
-    ? 'Keep-awake off'
-    : live === true
-      ? 'Live'
-      : live === false
-        ? 'No response'
-        : 'Pinging…';
+  let dotClass = 'off';
+  let title = 'Keep-awake off';
+  if (enabled) {
+    if (!status) {
+      dotClass = 'pending';
+      title = 'Pinging…';
+    } else if (status.crm === 'up' && status.agent === 'up') {
+      dotClass = 'live';
+      title = 'CRM live · Agent live';
+    } else if (status.crm === 'up' && status.agent === 'unknown') {
+      dotClass = 'live';
+      title = 'CRM live · Agent status unknown (AGENT_URL not set)';
+    } else {
+      dotClass = 'down';
+      title = `CRM ${status.crm} · Agent ${status.agent}`;
+    }
+  }
 
   return (
     <div className="keep-awake">
@@ -53,7 +63,7 @@ export default function KeepAwake() {
         />
         <span>Keep-awake</span>
       </label>
-      <span className={'ka-dot ' + dotClass} title={dotTitle} aria-label={dotTitle} />
+      <span className={'ka-dot ' + dotClass} title={title} aria-label={title} />
     </div>
   );
 }
