@@ -31,6 +31,9 @@ function createApp() {
     })
   );
 
+  // Health check — no auth, used by Render and uptime monitors.
+  app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
   // Bot integration uses bearer token auth, not sessions/CSRF — mounted before csrfProtect.
   app.use('/api/integrations', require('./routes/integrations'));
 
