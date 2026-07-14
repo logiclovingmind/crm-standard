@@ -10,6 +10,7 @@ import LeadDetail from './pages/LeadDetail';
 import Inventory from './pages/Inventory';
 import Visits from './pages/Visits';
 import Users from './pages/Users';
+import Train from './pages/Train';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -51,6 +52,7 @@ export default function App() {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/visits" element={<Visits />} />
           {me.role === 'owner' && <Route path="/users" element={<Users />} />}
+          <Route path="/train" element={<Train />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

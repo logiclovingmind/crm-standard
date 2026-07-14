@@ -61,6 +61,7 @@ export default function Layout({ children }) {
           <NavLink to="/inventory">{t('nav.inventory')}</NavLink>
           <NavLink to="/visits">{t('nav.visits')}</NavLink>
           {me.role === 'owner' && <NavLink to="/users">{t('nav.users')}</NavLink>}
+          <NavLink to="/train">{t('nav.train')}</NavLink>
         </nav>
         <div className="spacer" />
         <div className="footer">

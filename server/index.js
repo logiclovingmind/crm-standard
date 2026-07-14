@@ -66,6 +66,7 @@ function createApp() {
   app.use('/api/export', requireAuth, requireRole('owner'), require('./routes/export'));
   app.use('/api/users', requireAuth, require('./routes/users'));
   app.use('/api/status', requireAuth, require('./routes/status'));
+  app.use('/api/agent', requireAuth, require('./routes/agent'));
   app.use('/api/settings', requireAuth, requireRole('owner'), require('./routes/settings'));
 
   app.use('/api', (req, res) => res.status(404).json({ error: 'not found' }));

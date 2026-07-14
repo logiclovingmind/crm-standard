@@ -6,6 +6,7 @@
     "inventory": "Inventory",
     "visits": "Site Visits",
     "users": "Users",
+    "train": "Train agent",
     "logout": "Log out"
   },
   "login": { "title": "Sign in", "submit": "Sign in", "failed": "Invalid email or password", "rateLimited": "Too many attempts. Try again in a few minutes." },
