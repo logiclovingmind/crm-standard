@@ -10,7 +10,7 @@ services:
     name: crm-standard
     runtime: node
     plan: free
-    buildCommand: npm install && npm --prefix client install && npm run build
+    buildCommand: npm install && npm --prefix client install --include=dev && npm run build
     startCommand: node server/index.js
     healthCheckPath: /api/health
     envVars:
