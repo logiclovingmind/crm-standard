@@ -8,6 +8,7 @@ const { getDb } = require('./db');
 const { nowIST } = require('./lib/time');
 const { csrfProtect } = require('./middleware/csrf');
 const { requireAuth, requireRole } = require('./middleware/auth');
+const { seedDemoData } = require('./services/seedDemo');
 
 // Render's free tier wipes SQLite on every redeploy, so we re-seed a demo
 // owner from env vars on startup. No-op if SEED_EMAIL/SEED_PASSWORD unset,
@@ -26,9 +27,21 @@ function seedDemoUser(db) {
   console.log(`seeded demo user: ${email}`);
 }
 
+// Render's free tier wipes SQLite on every cold-start. With DEMO_SEED=1 we
+// repopulate a full demo brokerage (agents, managers, 30 leads, visits) when
+// the DB comes up empty, so demos always look "in full use". Never enabled on
+// the real VPS client deploy, and only ever touches an empty leads table.
+function autoSeedDemo(db) {
+  if (process.env.DEMO_SEED !== '1') return;
+  if (db.prepare('SELECT COUNT(*) AS n FROM leads').get().n > 0) return;
+  seedDemoData(db, { silent: true });
+  console.log('DEMO_SEED: seeded full demo dataset into empty CRM');
+}
+
 function createApp() {
   const db = getDb();
   seedDemoUser(db);
+  autoSeedDemo(db);
   const app = express();
   const isProd = process.env.NODE_ENV === 'production';
 
