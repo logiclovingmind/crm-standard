@@ -78,8 +78,6 @@
     "assign": "Assign",
     "conversationSummary": "Conversation summary",
     "whatsappConversation": "WhatsApp conversation",
-    "conversationUnavailable": "Conversation not available yet.",
-    "noConversation": "No messages exchanged yet.",
     "agentLabel": "Agent",
     "visits": "Site visits",
     "dealValue": "Deal value",

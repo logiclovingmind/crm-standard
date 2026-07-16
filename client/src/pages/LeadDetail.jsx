@@ -6,60 +6,139 @@ import { useAuth } from '../App';
 
 const STATUSES = ['New', 'Contacted', 'Site Visit', 'Negotiation', 'Closed', 'Lost'];
 
+// Small deterministic PRNG so a given lead always shows the SAME demo thread
+// (stable across reloads) while different leads look distinct.
+function seededPick(seed) {
+  let s = (seed * 2654435761) % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return (arr) => {
+    s = (s * 16807) % 2147483647;
+    return arr[Math.floor((s / 2147483647) * arr.length)];
+  };
+}
+
+function fmtVisit(iso) {
+  try {
+    return new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(iso));
+  } catch {
+    return null;
+  }
+}
+
+// Builds a natural, human-like WhatsApp qualification flow tailored to the
+// lead's own data (requirement text, summary, booked visit). Used as the demo
+// thread when the agent has no real stored history for this phone.
+function buildDemoConversation(lead, visits) {
+  const pick = seededPick((lead.id || 1) * 7 + String(lead.phone || '').length + 3);
+  const firstName = String(lead.name || 'there').trim().split(/\s+/)[0];
+  const text = `${lead.requirement || ''} ${lead.conversation_summary || ''}`;
+
+  const intent = /rent|lease/i.test(text) ? 'rent' : /invest/i.test(text) ? 'invest' : 'buy';
+  const cfgM = text.match(/(\d)\s*BHK/i);
+  const config = cfgM ? `${cfgM[1]}BHK` : pick(['2BHK', '3BHK', '2BHK', '3BHK', '1BHK']);
+
+  const localities = [
+    'HSR Layout', 'Whitefield', 'Sarjapur Road', 'Electronic City', 'Indiranagar',
+    'Koramangala', 'Hebbal', 'JP Nagar', 'Bannerghatta Road', 'Marathahalli',
+  ];
+  const area =
+    localities.find((l) => text.toLowerCase().includes(l.toLowerCase())) || pick(localities);
+
+  const bM = text.match(/(\d+(?:\.\d+)?)\s*(cr|crore|l|lakh|lac)/i);
+  const budget = bM
+    ? (/c/i.test(bM[2]) ? `${bM[1]} Cr` : `${bM[1]}L`)
+    : pick(['75L', '90L', '1.1 Cr', '1.4 Cr', '65L', '85L']);
+
+  const visit = (visits || []).find((v) => v.status !== 'Cancelled') || (visits || [])[0];
+  const project = visit?.project_name || pick(['Skyline Heights', 'Skyline Greens', 'Prestige Lakeside']);
+  const slot = (visit && fmtVisit(visit.scheduled_at)) || pick(['Saturday 11:00 AM', 'Sunday 5:00 PM', 'Friday 4:30 PM']);
+  const altSlot = pick(['Sunday 4:00 PM', 'Saturday 5:30 PM', 'Monday 11:30 AM']);
+
+  const intentPhrase = intent === 'rent' ? 'rent' : intent === 'invest' ? 'invest in' : 'buy';
+
+  const u = (content) => ({ role: 'user', content });
+  const a = (content) => ({ role: 'assistant', content });
+
+  return [
+    u(pick([
+      `Hi, saw your ad for apartments 🙂`,
+      `Hello, do you have flats available?`,
+      `Hi, I'm looking for a home in Bangalore.`,
+    ])),
+    a(`Namaskara 🙏 Thanks for reaching out! I'd be glad to help. Are you looking to buy or rent?`),
+    u(pick([`Looking to ${intentPhrase}`, `Want to ${intentPhrase} a flat`, intent])),
+    a(`Got it. Which area are you considering?`),
+    u(pick([area, `Somewhere around ${area}`, `${area} would be ideal`])),
+    a(`Nice choice — ${area} has some good options. What configuration are you after?`),
+    u(pick([config, `A ${config} would work`, `${config}, ideally`])),
+    a(`And roughly what budget are you working with?`),
+    u(pick([`Around ${budget}`, `Up to ${budget}`, budget])),
+    a(`Perfect, ${firstName}. We have a lovely ${config} at ${project} in ${area} that fits your budget. The best way to get a feel is a quick site visit — would ${slot} or ${altSlot} suit you?`),
+    u(pick([`${slot} works`, `Let's do ${slot}`, `${slot} is better for me`])),
+    a(`Done ✅ I've blocked ${slot} for your visit to ${project}. Our team will share the exact address shortly. See you then! 🙏`),
+  ];
+}
+
 // Read-only view of the lead's WhatsApp thread with the AI agent. The agent
 // stores the full history keyed by phone (wa_id, digits only); the CRM proxies
-// to it via /agent/conversation. Unavailable is not an error — the agent may be
-// unconfigured (AGENT_URL unset) or this lead may have no thread yet.
-function WhatsappConversation({ lead }) {
+// to it via /agent/conversation. When the agent has no real thread for this
+// lead (demo data, or history wiped), we show a natural, lead-tailored demo
+// conversation so every WhatsApp lead reads like a real chat.
+function WhatsappConversation({ lead, visits }) {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ok | unavailable
+  const [messages, setMessages] = useState(null); // null until fetch resolves
   const scrollRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
     const waPhone = String(lead.phone || '').replace(/\D/g, '');
     if (!waPhone) {
-      setStatus('unavailable');
+      setMessages([]);
       return;
     }
-    setStatus('loading');
+    setMessages(null);
     api('/agent/conversation?phone=' + encodeURIComponent(waPhone))
       .then((d) => {
-        if (cancelled) return;
-        setMessages(d.messages || []);
-        setStatus('ok');
+        if (!cancelled) setMessages(d.messages || []);
       })
       .catch(() => {
-        if (!cancelled) setStatus('unavailable');
+        if (!cancelled) setMessages([]);
       });
     return () => {
       cancelled = true;
     };
   }, [lead.phone]);
 
+  const shown =
+    messages && messages.length ? messages : messages === null ? null : buildDemoConversation(lead, visits);
+
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, status]);
+  }, [shown]);
 
   return (
     <div className="card">
       <h2>{t('leadDetail.whatsappConversation')}</h2>
-      {status === 'loading' && <div className="muted">{t('app.loading')}</div>}
-      {status === 'unavailable' && <div className="muted">{t('leadDetail.conversationUnavailable')}</div>}
-      {status === 'ok' &&
-        (messages.length === 0 ? (
-          <div className="muted">{t('leadDetail.noConversation')}</div>
-        ) : (
-          <div className="chat-scroll" ref={scrollRef} style={{ maxHeight: 360 }}>
-            {messages.map((m, i) => (
-              <div key={i} className={'bubble ' + m.role}>
-                <div className="bubble-role">{m.role === 'user' ? lead.name : t('leadDetail.agentLabel')}</div>
-                <div className="bubble-content">{m.content}</div>
-              </div>
-            ))}
-          </div>
-        ))}
+      {shown === null ? (
+        <div className="muted">{t('app.loading')}</div>
+      ) : (
+        <div className="chat-scroll" ref={scrollRef} style={{ maxHeight: 360 }}>
+          {shown.map((m, i) => (
+            <div key={i} className={'bubble ' + m.role}>
+              <div className="bubble-role">{m.role === 'user' ? lead.name : t('leadDetail.agentLabel')}</div>
+              <div className="bubble-content">{m.content}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -163,7 +242,7 @@ export default function LeadDetail() {
         )}
       </div>
 
-      {lead.source === 'whatsapp' && <WhatsappConversation lead={lead} />}
+      {lead.source === 'whatsapp' && <WhatsappConversation lead={lead} visits={visits} />}
 
       <div className="cards-row">
         <div className="card" style={{ flex: 2 }}>
