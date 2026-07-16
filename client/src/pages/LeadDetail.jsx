@@ -130,7 +130,7 @@ function WhatsappConversation({ lead, visits }) {
       {shown === null ? (
         <div className="muted">{t('app.loading')}</div>
       ) : (
-        <div className="chat-scroll" ref={scrollRef} style={{ maxHeight: 360 }}>
+        <div className="chat-scroll" ref={scrollRef} style={{ maxHeight: 300 }}>
           {shown.map((m, i) => (
             <div key={i} className={'bubble ' + m.role}>
               <div className="bubble-role">{m.role === 'user' ? lead.name : t('leadDetail.agentLabel')}</div>
@@ -242,101 +242,103 @@ export default function LeadDetail() {
         )}
       </div>
 
-      {lead.source === 'whatsapp' && <WhatsappConversation lead={lead} visits={visits} />}
-
-      <div className="cards-row">
-        <div className="card" style={{ flex: 2 }}>
-          <h2>{t('leadDetail.notes')}</h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!note.trim()) return;
-              act(() => api(`/leads/${id}/notes`, { method: 'POST', body: { body: note } })).then(() => setNote(''));
-            }}
-          >
-            <textarea rows={2} placeholder={t('leadDetail.notePlaceholder')} value={note} onChange={(e) => setNote(e.target.value)} />
-            <button className="primary" style={{ marginTop: 6 }}>{t('leadDetail.addNote')}</button>
-          </form>
-          {notes.map((n) => (
-            <div className="note" key={n.id}>
-              <div>{n.body}</div>
-              <div className="meta">{n.author} · {n.created_at.slice(0, 16).replace('T', ' ')}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="card" style={{ flex: 1 }}>
-          <h2>{t('leadDetail.activity')}</h2>
-          {activity.map((a) => (
-            <div className="timeline-item" key={a.id}>
-              <strong>{a.type}</strong>
-              {a.from_status && a.to_status && ` ${t(`status.${a.from_status}`)} → ${t(`status.${a.to_status}`)}`}
-              {a.detail && <div className="muted">{a.detail}</div>}
-              <div className="muted">{a.user_name || 'bot'} · {a.created_at.slice(0, 16).replace('T', ' ')}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="cards-row">
-        <div className="card">
-          <h2>{t('leadDetail.unitsOfInterest')}</h2>
-          {data.units.map((u) => (
-            <div className="form-row" key={u.id}>
-              <span>{u.project_name} / {u.identifier} ({t(`unitType.${u.type}`)})</span>
+      <div className="lead-layout">
+        <div className="lead-col lead-main">
+          <div className="card">
+            <h2>{t('leadDetail.unitsOfInterest')}</h2>
+            {data.units.map((u) => (
+              <div className="form-row" key={u.id}>
+                <span>{u.project_name} / {u.identifier} ({t(`unitType.${u.type}`)})</span>
+                <button
+                  className="link danger"
+                  onClick={() => act(() => api(`/leads/${id}/units/${u.id}`, { method: 'DELETE' }))}
+                >
+                  {t('leadDetail.remove')}
+                </button>
+              </div>
+            ))}
+            <div className="form-row">
+              <select value={linkUnitId} onChange={(e) => setLinkUnitId(e.target.value)}>
+                <option value="">{t('leadDetail.linkUnit')}</option>
+                {units.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.project_name} / {u.identifier}
+                  </option>
+                ))}
+              </select>
               <button
-                className="link danger"
-                onClick={() => act(() => api(`/leads/${id}/units/${u.id}`, { method: 'DELETE' }))}
+                disabled={!linkUnitId}
+                onClick={() =>
+                  act(() => api(`/leads/${id}/units`, { method: 'POST', body: { unit_id: Number(linkUnitId) } })).then(() =>
+                    setLinkUnitId('')
+                  )
+                }
               >
-                {t('leadDetail.remove')}
+                {t('common.add')}
               </button>
             </div>
-          ))}
-          <div className="form-row">
-            <select value={linkUnitId} onChange={(e) => setLinkUnitId(e.target.value)}>
-              <option value="">{t('leadDetail.linkUnit')}</option>
-              {units.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.project_name} / {u.identifier}
-                </option>
-              ))}
-            </select>
-            <button
-              disabled={!linkUnitId}
-              onClick={() =>
-                act(() => api(`/leads/${id}/units`, { method: 'POST', body: { unit_id: Number(linkUnitId) } })).then(() =>
-                  setLinkUnitId('')
-                )
-              }
+          </div>
+
+          <div className="card">
+            <h2>{t('leadDetail.visits')}</h2>
+            {visits.map((v) => (
+              <div className="timeline-item" key={v.id}>
+                {v.scheduled_at.slice(0, 16).replace('T', ' ')} · {t(`visitStatus.${v.status}`)}
+                {v.project_name && <span className="muted"> · {v.project_name}</span>}
+              </div>
+            ))}
+            <div className="form-row" style={{ marginTop: 8 }}>
+              <input type="datetime-local" value={visitAt} onChange={(e) => setVisitAt(e.target.value)} />
+              <button
+                disabled={!visitAt}
+                onClick={() =>
+                  act(() =>
+                    api('/visits', {
+                      method: 'POST',
+                      body: { lead_id: Number(id), scheduled_at: visitAt + ':00+05:30' },
+                    })
+                  ).then(() => setVisitAt(''))
+                }
+              >
+                {t('leadDetail.scheduleVisit')}
+              </button>
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>{t('leadDetail.notes')}</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!note.trim()) return;
+                act(() => api(`/leads/${id}/notes`, { method: 'POST', body: { body: note } })).then(() => setNote(''));
+              }}
             >
-              {t('common.add')}
-            </button>
+              <textarea rows={2} placeholder={t('leadDetail.notePlaceholder')} value={note} onChange={(e) => setNote(e.target.value)} />
+              <button className="primary" style={{ marginTop: 6 }}>{t('leadDetail.addNote')}</button>
+            </form>
+            {notes.map((n) => (
+              <div className="note" key={n.id}>
+                <div>{n.body}</div>
+                <div className="meta">{n.author} · {n.created_at.slice(0, 16).replace('T', ' ')}</div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="card">
-          <h2>{t('leadDetail.visits')}</h2>
-          {visits.map((v) => (
-            <div className="timeline-item" key={v.id}>
-              {v.scheduled_at.slice(0, 16).replace('T', ' ')} · {t(`visitStatus.${v.status}`)}
-              {v.project_name && <span className="muted"> · {v.project_name}</span>}
-            </div>
-          ))}
-          <div className="form-row" style={{ marginTop: 8 }}>
-            <input type="datetime-local" value={visitAt} onChange={(e) => setVisitAt(e.target.value)} />
-            <button
-              disabled={!visitAt}
-              onClick={() =>
-                act(() =>
-                  api('/visits', {
-                    method: 'POST',
-                    body: { lead_id: Number(id), scheduled_at: visitAt + ':00+05:30' },
-                  })
-                ).then(() => setVisitAt(''))
-              }
-            >
-              {t('leadDetail.scheduleVisit')}
-            </button>
+        <div className="lead-col lead-side">
+          {lead.source === 'whatsapp' && <WhatsappConversation lead={lead} visits={visits} />}
+
+          <div className="card">
+            <h2>{t('leadDetail.activity')}</h2>
+            {activity.map((a) => (
+              <div className="timeline-item" key={a.id}>
+                <strong>{a.type}</strong>
+                {a.from_status && a.to_status && ` ${t(`status.${a.from_status}`)} → ${t(`status.${a.to_status}`)}`}
+                {a.detail && <div className="muted">{a.detail}</div>}
+                <div className="muted">{a.user_name || 'bot'} · {a.created_at.slice(0, 16).replace('T', ' ')}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
