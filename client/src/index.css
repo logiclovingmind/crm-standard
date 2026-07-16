@@ -232,6 +232,7 @@ button.danger { color: var(--danger); }
   font-family: var(--font-mono); font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.1em;
 }
+.bar-row .bar-track { flex: 1; min-width: 0; }
 .bar-row .bar {
   background: var(--text); height: 14px; min-width: 2px;
   clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
@@ -429,6 +430,7 @@ button.danger { color: var(--danger); }
   input, select, textarea { font-size: 16px; }  /* avoids iOS zoom-on-focus */
   .filters { gap: 6px; }
   .filters input, .filters select, .filters button { flex: 1 1 46%; }
+  .bar-row .label { width: 84px; }
 
   .login-page { gap: 24px; padding: 0 16px; }
   .login-box { width: 100%; max-width: 360px; padding: 24px; --cut: 20px; }

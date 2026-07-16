@@ -10,7 +10,9 @@ function Bars({ data, labelFn }) {
       {data.map((d) => (
         <div className="bar-row" key={d.key}>
           <span className="label">{labelFn(d.key)}</span>
-          <div className="bar" style={{ width: `${(d.n / max) * 240}px` }} />
+          <div className="bar-track">
+            <div className="bar" style={{ width: `${(d.n / max) * 100}%` }} />
+          </div>
           <span>{d.n}</span>
         </div>
       ))}
@@ -27,7 +29,9 @@ function SourceBars({ data, labelFn }) {
       {data.map((d) => (
         <div className="bar-row" key={d.key}>
           <span className="label">{labelFn(d.key)}</span>
-          <div className="bar" style={{ width: `${(d.n / max) * 200}px` }} />
+          <div className="bar-track">
+            <div className="bar" style={{ width: `${(d.n / max) * 100}%` }} />
+          </div>
           <span>{d.n}</span>
           <span className="muted" style={{ marginLeft: 8 }}>{d.conversion}%</span>
         </div>
