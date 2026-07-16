@@ -50,6 +50,8 @@
     "title": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
     "leadsThisMonth": "ಈ ತಿಂಗಳ ಲೀಡ್‌ಗಳು",
     "lastMonth": "ಕಳೆದ ತಿಂಗಳು: {{count}}",
+    "closedThisMonth": "__TODO__ Closed this month",
+    "dealsClosed": "__TODO__ {{count}} deals closed",
     "sourceBreakdown": "ಮೂಲಗಳ ವಿಂಗಡಣೆ",
     "funnel": "ಮಾರಾಟ ಫನಲ್",
     "staleLeads": "3 ದಿನಗಳಿಂದ ಸಂಪರ್ಕವಿಲ್ಲ",
@@ -75,7 +77,10 @@
     "scheduleVisit": "ಸೈಟ್ ಭೇಟಿ ನಿಗದಿಪಡಿಸಿ",
     "assign": "ನಿಯೋಜಿಸಿ",
     "conversationSummary": "ಸಂಭಾಷಣೆಯ ಸಾರಾಂಶ",
-    "visits": "ಸೈಟ್ ಭೇಟಿಗಳು"
+    "visits": "ಸೈಟ್ ಭೇಟಿಗಳು",
+    "dealValue": "__TODO__ Deal value",
+    "dealValuePlaceholder": "__TODO__ e.g. 8500000",
+    "dealValueHint": "__TODO__ Set when the deal closes — feeds the revenue dashboard"
   },
   "visits": {
     "title": "ಸೈಟ್ ಭೇಟಿಗಳು",

@@ -39,12 +39,39 @@ router.get('/summary', (req, res) => {
     .prepare(`SELECT COUNT(*) AS n FROM leads WHERE created_at LIKE ?${scopeSql}`)
     .get(istMonthPrefix(1) + '%', ...scopeParams).n;
 
+  // Per-source: total leads, how many closed, and the conversion % — the
+  // renewal-justifying view of "which channel actually produces deals".
   const sources = db
-    .prepare(`SELECT source, COUNT(*) AS n FROM leads WHERE 1=1${scopeSql} GROUP BY source ORDER BY n DESC`)
-    .all(...scopeParams);
+    .prepare(
+      `SELECT source,
+              COUNT(*) AS n,
+              SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) AS closed
+       FROM leads WHERE 1=1${scopeSql} GROUP BY source ORDER BY n DESC`
+    )
+    .all(...scopeParams)
+    .map((s) => ({
+      ...s,
+      conversion: s.n ? Math.round((s.closed / s.n) * 1000) / 10 : 0,
+    }));
   const funnel = db
     .prepare(`SELECT status, COUNT(*) AS n FROM leads WHERE 1=1${scopeSql} GROUP BY status`)
     .all(...scopeParams);
+
+  // Deals closed THIS month, timed by the status-change activity (not lead
+  // creation — a deal closes long after the lead arrives). Only count leads
+  // still Closed now, so a closed-then-reopened lead doesn't inflate revenue.
+  const closedScopeSql = scope ? ' AND l.assigned_to = ?' : '';
+  const closedThisMonth = db
+    .prepare(
+      `WITH closed_ids AS (
+         SELECT DISTINCT lead_id FROM lead_activity
+         WHERE type = 'status_change' AND to_status = 'Closed' AND created_at LIKE ?
+       )
+       SELECT COUNT(*) AS deals, COALESCE(SUM(l.deal_value), 0) AS revenue
+       FROM closed_ids c JOIN leads l ON l.id = c.lead_id
+       WHERE l.status = 'Closed'${closedScopeSql}`
+    )
+    .get(istMonthPrefix(0) + '%', ...scopeParams);
 
   const stale = staleLeads(db, scope);
 
@@ -53,6 +80,7 @@ router.get('/summary', (req, res) => {
     leadsLastMonth: lastMonth,
     sources,
     funnel,
+    closedThisMonth,
     staleCount: stale.length,
   };
   if (req.session.user.role === 'owner') summary.backup = getBackupStatus();

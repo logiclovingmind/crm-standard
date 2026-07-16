@@ -18,6 +18,32 @@ function Bars({ data, labelFn }) {
   );
 }
 
+// Source bars annotated with the conversion % (closed / total) — the
+// "which channel actually produces deals" view.
+function SourceBars({ data, labelFn }) {
+  const max = Math.max(...data.map((d) => d.n), 1);
+  return (
+    <div>
+      {data.map((d) => (
+        <div className="bar-row" key={d.key}>
+          <span className="label">{labelFn(d.key)}</span>
+          <div className="bar" style={{ width: `${(d.n / max) * 200}px` }} />
+          <span>{d.n}</span>
+          <span className="muted" style={{ marginLeft: 8 }}>{d.conversion}%</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Compact Indian money format for large real-estate deal values.
+function formatINR(amount) {
+  const n = Number(amount) || 0;
+  if (n >= 10000000) return `₹${(n / 10000000).toFixed(2)} Cr`;
+  if (n >= 100000) return `₹${(n / 100000).toFixed(2)} L`;
+  return `₹${n.toLocaleString('en-IN')}`;
+}
+
 export default function Dashboard() {
   const { t } = useTranslation();
   const [summary, setSummary] = useState(null);
@@ -32,7 +58,8 @@ export default function Dashboard() {
 
   const STATUS_ORDER = ['New', 'Contacted', 'Site Visit', 'Negotiation', 'Closed', 'Lost'];
   const funnel = STATUS_ORDER.map((s) => ({ key: s, n: summary.funnel.find((f) => f.status === s)?.n || 0 }));
-  const sources = summary.sources.map((s) => ({ key: s.source, n: s.n }));
+  const sources = summary.sources.map((s) => ({ key: s.source, n: s.n, conversion: s.conversion ?? 0 }));
+  const closed = summary.closedThisMonth || { deals: 0, revenue: 0 };
 
   return (
     <div>
@@ -49,6 +76,11 @@ export default function Dashboard() {
           <div className="stat-sub">{t('dashboard.lastMonth', { count: summary.leadsLastMonth })}</div>
         </div>
         <div className="card">
+          <h2>{t('dashboard.closedThisMonth')}</h2>
+          <div className="stat">{formatINR(closed.revenue)}</div>
+          <div className="stat-sub">{t('dashboard.dealsClosed', { count: closed.deals })}</div>
+        </div>
+        <div className="card">
           <h2>{t('dashboard.staleCount')}</h2>
           <div className="stat">{summary.staleCount}</div>
           <div className="stat-sub">{t('dashboard.staleLeads')}</div>
@@ -62,7 +94,7 @@ export default function Dashboard() {
         </div>
         <div className="card">
           <h2>{t('dashboard.sourceBreakdown')}</h2>
-          {sources.length ? <Bars data={sources} labelFn={(k) => t(`source.${k}`)} /> : <p className="muted">{t('app.noResults')}</p>}
+          {sources.length ? <SourceBars data={sources} labelFn={(k) => t(`source.${k}`)} /> : <p className="muted">{t('app.noResults')}</p>}
         </div>
       </div>
 

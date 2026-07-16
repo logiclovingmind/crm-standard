@@ -50,6 +50,8 @@
     "title": "Dashboard",
     "leadsThisMonth": "Leads this month",
     "lastMonth": "Last month: {{count}}",
+    "closedThisMonth": "Closed this month",
+    "dealsClosed": "{{count}} deals closed",
     "sourceBreakdown": "Source breakdown",
     "funnel": "Pipeline funnel",
     "staleLeads": "No contact in 3 days",
@@ -75,7 +77,10 @@
     "scheduleVisit": "Schedule site visit",
     "assign": "Assign",
     "conversationSummary": "Conversation summary",
-    "visits": "Site visits"
+    "visits": "Site visits",
+    "dealValue": "Deal value",
+    "dealValuePlaceholder": "e.g. 8500000",
+    "dealValueHint": "Set when the deal closes — feeds the revenue dashboard"
   },
   "visits": {
     "title": "Site Visits",

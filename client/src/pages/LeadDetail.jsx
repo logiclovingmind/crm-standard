@@ -13,6 +13,7 @@ export default function LeadDetail() {
   const canAssign = me.role === 'owner' || me.role === 'manager';
 
   const [data, setData] = useState(null);
+  const [dealValue, setDealValue] = useState('');
   const [note, setNote] = useState('');
   const [assignable, setAssignable] = useState([]);
   const [units, setUnits] = useState([]);
@@ -21,7 +22,9 @@ export default function LeadDetail() {
   const [error, setError] = useState(null);
 
   async function load() {
-    setData(await api(`/leads/${id}`));
+    const d = await api(`/leads/${id}`);
+    setData(d);
+    setDealValue(d.lead.deal_value ?? '');
   }
 
   useEffect(() => {
@@ -79,6 +82,22 @@ export default function LeadDetail() {
               {t('common.assignedTo')}: {lead.assigned_name || t('common.unassigned')}
             </span>
           )}
+        </div>
+        <div className="form-row">
+          <label>{t('leadDetail.dealValue')}</label>
+          <input
+            type="number"
+            min="0"
+            placeholder={t('leadDetail.dealValuePlaceholder')}
+            value={dealValue}
+            onChange={(e) => setDealValue(e.target.value)}
+            onBlur={() => {
+              const next = dealValue === '' ? null : Number(dealValue);
+              if (next === (lead.deal_value ?? null)) return;
+              act(() => api(`/leads/${id}`, { method: 'PUT', body: { deal_value: next } }));
+            }}
+          />
+          <span className="muted">{t('leadDetail.dealValueHint')}</span>
         </div>
         {lead.requirement && <p>{t('leads.requirement')}: {lead.requirement}</p>}
         {lead.conversation_summary && (

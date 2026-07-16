@@ -130,7 +130,7 @@ router.get('/:id', (req, res) => {
 router.put('/:id', (req, res) => {
   const lead = getLeadScoped(req, res);
   if (!lead) return;
-  const { name, phone, requirement, status } = req.body || {};
+  const { name, phone, requirement, status, deal_value } = req.body || {};
 
   let normPhone = lead.phone;
   if (phone !== undefined) {
@@ -141,13 +141,28 @@ router.put('/:id', (req, res) => {
     return res.status(400).json({ error: 'invalid status' });
   }
 
+  // deal_value: number >= 0 to set, null/'' to clear. Reject junk.
+  let nextDealValue = lead.deal_value;
+  if (deal_value !== undefined) {
+    if (deal_value === null || deal_value === '') {
+      nextDealValue = null;
+    } else {
+      const n = Number(deal_value);
+      if (!Number.isFinite(n) || n < 0) return res.status(400).json({ error: 'invalid deal_value' });
+      nextDealValue = n;
+    }
+  }
+
   const db = getDb();
   db.transaction(() => {
-    db.prepare('UPDATE leads SET name = ?, phone = ?, requirement = ?, status = ?, updated_at = ? WHERE id = ?').run(
+    db.prepare(
+      'UPDATE leads SET name = ?, phone = ?, requirement = ?, status = ?, deal_value = ?, updated_at = ? WHERE id = ?'
+    ).run(
       typeof name === 'string' && name.trim() ? name.trim() : lead.name,
       normPhone,
       requirement !== undefined ? requirement : lead.requirement,
       status ?? lead.status,
+      nextDealValue,
       nowIST(),
       lead.id
     );
