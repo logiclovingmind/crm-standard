@@ -1,10 +1,68 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { useAuth } from '../App';
 
 const STATUSES = ['New', 'Contacted', 'Site Visit', 'Negotiation', 'Closed', 'Lost'];
+
+// Read-only view of the lead's WhatsApp thread with the AI agent. The agent
+// stores the full history keyed by phone (wa_id, digits only); the CRM proxies
+// to it via /agent/conversation. Unavailable is not an error — the agent may be
+// unconfigured (AGENT_URL unset) or this lead may have no thread yet.
+function WhatsappConversation({ lead }) {
+  const { t } = useTranslation();
+  const [messages, setMessages] = useState([]);
+  const [status, setStatus] = useState('loading'); // loading | ok | unavailable
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const waPhone = String(lead.phone || '').replace(/\D/g, '');
+    if (!waPhone) {
+      setStatus('unavailable');
+      return;
+    }
+    setStatus('loading');
+    api('/agent/conversation?phone=' + encodeURIComponent(waPhone))
+      .then((d) => {
+        if (cancelled) return;
+        setMessages(d.messages || []);
+        setStatus('ok');
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('unavailable');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [lead.phone]);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, status]);
+
+  return (
+    <div className="card">
+      <h2>{t('leadDetail.whatsappConversation')}</h2>
+      {status === 'loading' && <div className="muted">{t('app.loading')}</div>}
+      {status === 'unavailable' && <div className="muted">{t('leadDetail.conversationUnavailable')}</div>}
+      {status === 'ok' &&
+        (messages.length === 0 ? (
+          <div className="muted">{t('leadDetail.noConversation')}</div>
+        ) : (
+          <div className="chat-scroll" ref={scrollRef} style={{ maxHeight: 360 }}>
+            {messages.map((m, i) => (
+              <div key={i} className={'bubble ' + m.role}>
+                <div className="bubble-role">{m.role === 'user' ? lead.name : t('leadDetail.agentLabel')}</div>
+                <div className="bubble-content">{m.content}</div>
+              </div>
+            ))}
+          </div>
+        ))}
+    </div>
+  );
+}
 
 export default function LeadDetail() {
   const { id } = useParams();
@@ -104,6 +162,8 @@ export default function LeadDetail() {
           <p className="muted">{t('leadDetail.conversationSummary')}: {lead.conversation_summary}</p>
         )}
       </div>
+
+      {lead.source === 'whatsapp' && <WhatsappConversation lead={lead} />}
 
       <div className="cards-row">
         <div className="card" style={{ flex: 2 }}>
