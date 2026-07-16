@@ -10,9 +10,12 @@ router.get('/system', async (_req, res) => {
   let agent = 'unknown';
   if (agentUrl) {
     try {
+      // 30s, not a few seconds: the agent runs on Render's free tier and a
+      // cold start (spun down after idle) can take ~20s to answer. A short
+      // timeout would abort mid-wake and falsely report the agent as down.
       const r = await fetch(agentUrl + '/', {
         method: 'GET',
-        signal: AbortSignal.timeout(6000),
+        signal: AbortSignal.timeout(30000),
       });
       agent = r.ok ? 'up' : 'down';
     } catch {
