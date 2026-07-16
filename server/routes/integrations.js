@@ -33,11 +33,12 @@ router.post('/whatsapp/lead', requireBotToken, (req, res) => {
 // broker needs to do — no agent redeploy. Each url is the public download route.
 router.get('/whatsapp/brochures', requireBotToken, (req, res) => {
   const rows = getDb()
-    .prepare('SELECT id, name, brochure_filename FROM projects WHERE brochure_filename IS NOT NULL ORDER BY name')
+    .prepare('SELECT id, name, location, brochure_filename FROM projects WHERE brochure_filename IS NOT NULL ORDER BY name')
     .all();
   const base = `${req.protocol}://${req.get('host')}`;
   const brochures = rows.map((p) => ({
     project: p.name,
+    location: p.location || null,
     filename: p.brochure_filename,
     url: `${base}/brochures/${p.id}`,
   }));
