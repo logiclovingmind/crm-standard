@@ -2,12 +2,29 @@ const express = require('express');
 const { getDb } = require('../db');
 const { nowIST } = require('../lib/time');
 const { requireRole } = require('../middleware/auth');
+const brochureStore = require('../lib/brochureStore');
 
 const UNIT_TYPES = ['1BHK', '2BHK', '3BHK', 'plot', 'villa'];
 const UNIT_STATUSES = ['available', 'blocked', 'sold'];
 
+const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB — brochures are a few pages
+// Buffer the raw upload ourselves (no multer): the client POSTs the PDF bytes
+// as the request body with content-type application/pdf.
+const pdfRaw = express.raw({ type: ['application/pdf', 'application/octet-stream'], limit: MAX_PDF_BYTES });
+
 const router = express.Router();
 const canEdit = requireRole('owner', 'manager');
+
+function sanitizeFilename(raw) {
+  let name = String(raw || 'brochure.pdf')
+    .replace(/[\r\n"\\/]+/g, ' ')
+    .replace(/[^\w.\- ]+/g, '')
+    .trim()
+    .slice(0, 120);
+  if (!name) name = 'brochure.pdf';
+  if (!/\.pdf$/i.test(name)) name += '.pdf';
+  return name;
+}
 
 router.get('/projects', (req, res) => {
   const projects = getDb()
@@ -43,6 +60,35 @@ router.put('/projects/:id', canEdit, (req, res) => {
     nowIST(),
     project.id
   );
+  res.json({ ok: true });
+});
+
+// Upload (or replace) a project's brochure PDF. Raw-body upload, PDF-only.
+router.post('/projects/:id/brochure', canEdit, pdfRaw, (req, res) => {
+  const db = getDb();
+  const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
+  if (!project) return res.status(404).json({ error: 'not found' });
+  const buf = req.body;
+  if (!Buffer.isBuffer(buf) || buf.length === 0) return res.status(400).json({ error: 'empty upload' });
+  if (buf.length < 5 || buf.subarray(0, 5).toString('latin1') !== '%PDF-') {
+    return res.status(400).json({ error: 'not a PDF' });
+  }
+  const filename = sanitizeFilename(req.get('x-filename'));
+  brochureStore.save(project.id, buf);
+  db.prepare('UPDATE projects SET brochure_filename = ?, updated_at = ? WHERE id = ?').run(
+    filename,
+    nowIST(),
+    project.id
+  );
+  res.json({ ok: true, filename });
+});
+
+router.delete('/projects/:id/brochure', canEdit, (req, res) => {
+  const db = getDb();
+  const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
+  if (!project) return res.status(404).json({ error: 'not found' });
+  brochureStore.remove(project.id);
+  db.prepare('UPDATE projects SET brochure_filename = NULL, updated_at = ? WHERE id = ?').run(nowIST(), project.id);
   res.json({ ok: true });
 });
 

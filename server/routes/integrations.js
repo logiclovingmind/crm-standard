@@ -2,6 +2,7 @@ const express = require('express');
 const { safeEqual } = require('../middleware/csrf');
 const { intake } = require('../services/whatsappIntake');
 const calendar = require('../services/calendar');
+const { getDb } = require('../db');
 
 const router = express.Router();
 
@@ -25,6 +26,22 @@ router.post('/whatsapp/lead', requireBotToken, (req, res) => {
     visit_id: result.visitId ?? null,
   });
   if (result.visitId) calendar.onVisitCreated(result.visitId);
+});
+
+// Brochure catalog for the WhatsApp agent. It pulls this list (bearer-authed)
+// instead of a hardcoded env var, so uploading a PDF in the CRM is all the
+// broker needs to do — no agent redeploy. Each url is the public download route.
+router.get('/whatsapp/brochures', requireBotToken, (req, res) => {
+  const rows = getDb()
+    .prepare('SELECT id, name, brochure_filename FROM projects WHERE brochure_filename IS NOT NULL ORDER BY name')
+    .all();
+  const base = `${req.protocol}://${req.get('host')}`;
+  const brochures = rows.map((p) => ({
+    project: p.name,
+    filename: p.brochure_filename,
+    url: `${base}/brochures/${p.id}`,
+  }));
+  res.json({ brochures });
 });
 
 module.exports = router;

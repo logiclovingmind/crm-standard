@@ -108,7 +108,12 @@
     "type": "Type",
     "areaSqft": "Area (sqft)",
     "price": "Price",
-    "availableCount": "{{available}} of {{total}} available"
+    "availableCount": "{{available}} of {{total}} available",
+    "uploadBrochure": "Upload brochure",
+    "replaceBrochure": "Replace",
+    "removeBrochure": "Remove",
+    "noBrochure": "No brochure",
+    "brochurePdfOnly": "Please choose a PDF file"
   },
   "unitType": { "1BHK": "1 BHK", "2BHK": "2 BHK", "3BHK": "3 BHK", "plot": "Plot", "villa": "Villa" },
   "unitStatus": { "available": "Available", "blocked": "Blocked", "sold": "Sold" },

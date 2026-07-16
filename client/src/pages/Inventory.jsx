@@ -1,10 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api } from '../api';
+import { api, apiUpload } from '../api';
 import { useAuth } from '../App';
 
 const TYPES = ['1BHK', '2BHK', '3BHK', 'plot', 'villa'];
 const UNIT_STATUSES = ['available', 'blocked', 'sold'];
+
+function BrochureCell({ project, canEdit, onError, onChange }) {
+  const { t } = useTranslation();
+  const fileRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+  const has = Boolean(project.brochure_filename);
+
+  const upload = async (file) => {
+    if (!file) return;
+    if (file.type !== 'application/pdf') return onError(t('inventory.brochurePdfOnly'));
+    setBusy(true);
+    try {
+      await apiUpload(`/inventory/projects/${project.id}/brochure`, file);
+      onChange();
+    } catch (err) {
+      onError(err.message);
+    } finally {
+      setBusy(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  const remove = async () => {
+    setBusy(true);
+    try {
+      await api(`/inventory/projects/${project.id}/brochure`, { method: 'DELETE' });
+      onChange();
+    } catch (err) {
+      onError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      {has && (
+        <a href={`/brochures/${project.id}`} target="_blank" rel="noreferrer">
+          {project.brochure_filename}
+        </a>
+      )}
+      {canEdit && (
+        <>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/pdf"
+            style={{ display: 'none' }}
+            onChange={(e) => upload(e.target.files[0])}
+          />
+          <button className="link" disabled={busy} onClick={() => fileRef.current?.click()}>
+            {busy ? t('app.loading') : has ? t('inventory.replaceBrochure') : t('inventory.uploadBrochure')}
+          </button>
+          {has && (
+            <button className="link" disabled={busy} onClick={remove}>
+              {t('inventory.removeBrochure')}
+            </button>
+          )}
+        </>
+      )}
+      {!has && !canEdit && <span className="muted">{t('inventory.noBrochure')}</span>}
+    </div>
+  );
+}
 
 export default function Inventory() {
   const { t } = useTranslation();
@@ -77,6 +141,9 @@ export default function Inventory() {
                   </td>
                   <td className="muted">
                     {t('inventory.availableCount', { available: p.available_count || 0, total: p.unit_count || 0 })}
+                  </td>
+                  <td>
+                    <BrochureCell project={p} canEdit={canEdit} onError={setError} onChange={loadProjects} />
                   </td>
                 </tr>
               ))}

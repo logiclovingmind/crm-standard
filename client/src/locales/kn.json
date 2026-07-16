@@ -108,7 +108,12 @@
     "type": "ಪ್ರಕಾರ",
     "areaSqft": "ವಿಸ್ತೀರ್ಣ (ಚ.ಅ.)",
     "price": "ಬೆಲೆ",
-    "availableCount": "{{total}} ರಲ್ಲಿ {{available}} ಲಭ್ಯವಿದೆ"
+    "availableCount": "{{total}} ರಲ್ಲಿ {{available}} ಲಭ್ಯವಿದೆ",
+    "uploadBrochure": "__TODO__ Upload brochure",
+    "replaceBrochure": "__TODO__ Replace",
+    "removeBrochure": "__TODO__ Remove",
+    "noBrochure": "__TODO__ No brochure",
+    "brochurePdfOnly": "__TODO__ Please choose a PDF file"
   },
   "unitType": { "1BHK": "1 BHK", "2BHK": "2 BHK", "3BHK": "3 BHK", "plot": "ಪ್ಲಾಟ್", "villa": "ವಿಲ್ಲಾ" },
   "unitStatus": { "available": "ಲಭ್ಯವಿದೆ", "blocked": "ತಡೆಹಿಡಿಯಲಾಗಿದೆ", "sold": "ಮಾರಾಟವಾಗಿದೆ" },
