@@ -7,10 +7,20 @@ const brochureStore = require('../lib/brochureStore');
 const UNIT_TYPES = ['1BHK', '2BHK', '3BHK', 'plot', 'villa'];
 const UNIT_STATUSES = ['available', 'blocked', 'sold'];
 
-const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB — brochures are a few pages
+const MAX_PDF_BYTES = 30 * 1024 * 1024; // 30 MB — image-heavy brochures run big
 // Buffer the raw upload ourselves (no multer): the client POSTs the PDF bytes
 // as the request body with content-type application/pdf.
 const pdfRaw = express.raw({ type: ['application/pdf', 'application/octet-stream'], limit: MAX_PDF_BYTES });
+
+// Wrap pdfRaw so an oversize/malformed body returns a clear error instead of
+// falling through to the generic 500 handler.
+function uploadPdf(req, res, next) {
+  pdfRaw(req, res, (err) => {
+    if (!err) return next();
+    if (err.type === 'entity.too.large') return res.status(413).json({ error: 'file too large (max 30 MB)' });
+    return res.status(400).json({ error: 'could not read the upload' });
+  });
+}
 
 const router = express.Router();
 const canEdit = requireRole('owner', 'manager');
@@ -64,7 +74,7 @@ router.put('/projects/:id', canEdit, (req, res) => {
 });
 
 // Upload (or replace) a project's brochure PDF. Raw-body upload, PDF-only.
-router.post('/projects/:id/brochure', canEdit, pdfRaw, (req, res) => {
+router.post('/projects/:id/brochure', canEdit, uploadPdf, (req, res) => {
   const db = getDb();
   const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
   if (!project) return res.status(404).json({ error: 'not found' });
