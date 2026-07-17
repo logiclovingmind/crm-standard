@@ -131,6 +131,36 @@ export default function Dashboard() {
           </table>
         )}
       </div>
+
+      <ComingSoon />
+    </div>
+  );
+}
+
+// Feature preview for the automated WhatsApp follow-ups (re-engagement,
+// visit reminders, abandoned-enquiry nudges). These activate once the client's
+// WhatsApp Business number is live and Meta templates are approved.
+function ComingSoon() {
+  const { t } = useTranslation();
+  const items = ['reengage', 'reminders', 'followup'];
+  return (
+    <div className="card soon">
+      <div className="soon-head">
+        <h2>{t('comingSoon.title')}</h2>
+        <span className="badge soon">{t('comingSoon.badge')}</span>
+      </div>
+      <p className="soon-sub muted">{t('comingSoon.subtitle')}</p>
+      <div className="soon-list">
+        {items.map((k) => (
+          <div className="soon-item" key={k}>
+            <span className="dot" />
+            <div>
+              <div className="soon-title">{t(`comingSoon.${k}.title`)}</div>
+              <div className="soon-desc">{t(`comingSoon.${k}.desc`)}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -59,6 +59,23 @@
     "lastActivity": "Last activity",
     "backupWarning": "Backup warning: {{message}}"
   },
+  "comingSoon": {
+    "title": "Automated WhatsApp follow-ups",
+    "badge": "Coming soon",
+    "subtitle": "Activates once your WhatsApp Business number is approved and live.",
+    "reengage": {
+      "title": "Re-engagement nudges",
+      "desc": "Auto-messages leads who go quiet — a gentle nudge on day 2, 5 and 10 to pull them back before they cool off."
+    },
+    "reminders": {
+      "title": "Site-visit reminders",
+      "desc": "Reminds each lead 24 hours and 2 hours before their visit — cuts no-shows sharply."
+    },
+    "followup": {
+      "title": "Abandoned-enquiry follow-up",
+      "desc": "Spots leads who started sharing details but stopped, and re-opens the chat automatically."
+    }
+  },
   "leads": {
     "title": "Leads",
     "newLead": "New lead",
