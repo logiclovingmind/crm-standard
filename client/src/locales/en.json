@@ -1,5 +1,5 @@
 {
-  "app": { "title": "CRM", "loading": "Loading…", "noResults": "No results", "error": "Something went wrong" },
+  "app": { "title": "Logic Loving Mind OS", "loading": "Loading…", "noResults": "No results", "error": "Something went wrong" },
   "nav": {
     "dashboard": "Dashboard",
     "leads": "Leads",

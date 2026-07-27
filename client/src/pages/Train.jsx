@@ -165,7 +165,7 @@ export default function Train() {
               <div className="state-row"><span>Stage</span><strong>{state.stage || '—'}</strong></div>
               <div className="state-row"><span>Messages</span><strong>{state.messageCount ?? 0}</strong></div>
               {state.crm?.leadId != null && (
-                <div className="state-row"><span>CRM lead id</span><strong>#{state.crm.leadId}</strong></div>
+                <div className="state-row"><span>OS lead id</span><strong>#{state.crm.leadId}</strong></div>
               )}
               <h4>Fields</h4>
               {Object.keys(state.fields || {}).length === 0 ? (

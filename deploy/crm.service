@@ -1,5 +1,5 @@
 [Unit]
-Description=CRM (Standard tier)
+Description=Logic Loving Mind OS (IZI tier)
 After=network.target
 
 [Service]

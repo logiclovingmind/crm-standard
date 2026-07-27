@@ -2,7 +2,7 @@
   "name": "crm-standard",
   "version": "0.1.0",
   "private": true,
-  "description": "Secure Cloud CRM (Standard tier) — real-estate CRM for Indian SMB brokerages",
+  "description": "Logic Loving Mind OS (IZI tier) — real-estate operations software for Indian brokerages",
   "main": "server/index.js",
   "scripts": {
     "dev": "concurrently -n server,client \"PORT=3111 nodemon server/index.js\" \"npm --prefix client run dev\"",

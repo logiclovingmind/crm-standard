@@ -15,7 +15,7 @@ function agentConfig() {
 async function callAgent(path, { method = 'GET', body, query } = {}) {
   const cfg = agentConfig();
   if (!cfg) {
-    const err = new Error('AGENT_URL / SIMULATE_TOKEN not configured on the CRM');
+    const err = new Error('AGENT_URL / SIMULATE_TOKEN not configured on the OS');
     err.status = 503;
     throw err;
   }

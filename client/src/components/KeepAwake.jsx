@@ -43,13 +43,13 @@ export default function KeepAwake() {
       title = 'Pinging…';
     } else if (status.crm === 'up' && status.agent === 'up') {
       dotClass = 'live';
-      title = 'CRM live · Agent live';
+      title = 'OS live · Agent live';
     } else if (status.crm === 'up' && status.agent === 'unknown') {
       dotClass = 'live';
-      title = 'CRM live · Agent status unknown (AGENT_URL not set)';
+      title = 'OS live · Agent status unknown (AGENT_URL not set)';
     } else {
       dotClass = 'down';
-      title = `CRM ${status.crm} · Agent ${status.agent}`;
+      title = `OS ${status.crm} · Agent ${status.agent}`;
     }
   }
 
