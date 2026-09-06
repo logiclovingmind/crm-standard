@@ -8,7 +8,7 @@ The Logic Loving Mind OS for Indian SMB brokerages (5–20 agents), sold as the 
 
 ## Deployment target
 
-- **Host:** DigitalOcean Basic Droplet, **BLR1 (Bangalore)** region — "data stays in India" is a sales talking point, never move data out of region
+- **Host:** DigitalOcean Basic Droplet, **BLR1 (Bangalore)** region — data residency in India is a requirement, never move data out of region
 - **Size:** $6/mo (1 vCPU, 1GB RAM, 25GB SSD). Everything must run comfortably in 1GB RAM. Upgrade path: one-click resize to 2GB ($12) if a client grows
 - **OS:** Ubuntu 24.04 LTS
 - **One droplet = one client.** No multi-tenancy in the app. Tenant isolation is at the infra level
